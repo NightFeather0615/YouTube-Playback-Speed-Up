@@ -44,7 +44,7 @@ const insertStyleSheet = () => {
 .player-playback-speed-hint { \
   -webkit-box-pack: center; \
   -ms-flex-pack: center; \
-  background-color: rgba(15, 15, 15, 0.85); \
+  background-color: rgba(28, 28, 28, 0.9); \
   border-radius: 6px; \
   color: #f1f1f1; \
   display: -webkit-box; \
