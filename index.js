@@ -4,7 +4,7 @@
 // @name:zh-HK        YouTube 播放加速
 // @name:zh-CN        YouTube 播放加速
 // @namespace         https://github.com/NightFeather0615
-// @version           2.3
+// @version           2.3.1
 // @description       Speeding up shit talking without leaving out any information
 // @description:zh-TW 不錯過資訊的同時跳過廢話
 // @description:zh-HK 不錯過資訊的同時跳過廢話
@@ -42,30 +42,31 @@ const insertStyleSheet = () => {
     let styleSheet = document.createElement("style");
     styleSheet.textContent = ' \
 .player-playback-speed-hint { \
-  -webkit-box-pack: center; \
-  -ms-flex-pack: center; \
-  background-color: rgba(28, 28, 28, 0.9); \
-  border-radius: 6px; \
-  color: #f1f1f1; \
-  display: -webkit-box; \
-  display: -ms-flexbox; \
-  display: flex; \
-  height: 36px; \
-  justify-content: center; \
-  left: 50%; \
-  line-height: 36px; \
-  margin-left: -65px; \
-  position: absolute; \
-  top: 18px; \
-  width: 170px; \
-  z-index: 77; \
-  font-size: 13px; \
+    -webkit-box-pack: center; \
+    -ms-flex-pack: center; \
+    background-color: rgba(28, 28, 28, 0.9); \
+    border-radius: 6px; \
+    color: #f1f1f1; \
+    display: -webkit-box; \
+    display: -ms-flexbox; \
+    display: flex; \
+    height: 36px; \
+    justify-content: center; \
+    left: 50%; \
+    line-height: 36px; \
+    margin-left: -65px; \
+    position: absolute; \
+    top: 18px; \
+    width: 170px; \
+    z-index: 77; \
+    font-size: 13px; \
+    font-family: "Roboto", "Arial", sans-serif; \
 } \
  \
 .player-playback-speed-hint-icon { \
-  display: inline-block; \
-  margin-right: 8px; \
-  width: 22px \
+    display: inline-block; \
+    margin-right: 8px; \
+    width: 22px \
 } \
     '; // Style sheet from bilibili
     document.head.appendChild(styleSheet);
