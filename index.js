@@ -4,7 +4,7 @@
 // @name:zh-HK        YouTube 播放加速
 // @name:zh-CN        YouTube 播放加速
 // @namespace         https://github.com/NightFeather0615
-// @version           2.3.1
+// @version           2.3.2
 // @description       Speeding up shit talking without leaving out any information
 // @description:zh-TW 不錯過資訊的同時跳過廢話
 // @description:zh-HK 不錯過資訊的同時跳過廢話
@@ -134,10 +134,10 @@ const insertPlaybackSpeedHint = async () => {
     };
 
     document.addEventListener("keydown", async (event) => {
-        event.preventDefault();
-
         switch(event.keyCode) {
             case speedUpKey: {
+                event.preventDefault();
+                
                 if (event.repeat || isSpeedFixed) return;
 
                 isSpeedUp = true;
@@ -150,6 +150,8 @@ const insertPlaybackSpeedHint = async () => {
                 break;
             }
             case increaseSpeedKey: {
+                event.preventDefault();
+                
                 speedUpRate += 0.5;
                 console.log(`[YT Playback Speed Up] Set speed up rate to ${speedUpRate}`);
 
@@ -158,6 +160,8 @@ const insertPlaybackSpeedHint = async () => {
                 break;
             }
             case decreaseSpeedKey: {
+                event.preventDefault();
+                
                 if (speedUpRate <= 0) return;
 
                 speedUpRate -= 0.5;
@@ -168,6 +172,8 @@ const insertPlaybackSpeedHint = async () => {
                 break;
             }
             case resetSpeedKey: {
+                event.preventDefault();
+                
                 speedUpRate = 3;
                 console.log(`[YT Playback Speed Up] Set speed up rate to ${speedUpRate}`);
 
@@ -176,6 +182,8 @@ const insertPlaybackSpeedHint = async () => {
                 break;
             }
             case fixSpeedKey: {
+                event.preventDefault();
+                
                 if (!isSpeedUp && !isSpeedFixed) return;
 
                 if (isSpeedUp && !isSpeedFixed) {
@@ -194,9 +202,9 @@ const insertPlaybackSpeedHint = async () => {
     });
 
     document.addEventListener("keyup", (event) => {
-        event.preventDefault();
-
         if (event.keyCode === speedUpKey && !isSpeedFixed) {
+            event.preventDefault();
+            
             isSpeedUp = false;
             updateStatus();
         }
