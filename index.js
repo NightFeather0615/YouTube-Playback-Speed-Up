@@ -4,13 +4,13 @@
 // @name:zh-HK        YouTube 播放加速
 // @name:zh-CN        YouTube 播放加速
 // @namespace         https://github.com/NightFeather0615
-// @version           2.3.2
+// @version           2.5.0
 // @description       Speeding up shit talking without leaving out any information
 // @description:zh-TW 不錯過資訊的同時跳過廢話
 // @description:zh-HK 不錯過資訊的同時跳過廢話
 // @description:zh-CN 不错过资讯的同时跳过废话
 // @author            NightFeather
-// @match             http*://www.youtube.com/watch*
+// @match             *://www.youtube.com/*
 // @icon              https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @grant             none
 // @license           MPL-2.0
@@ -26,7 +26,7 @@ const waitElement = async (selector) => {
     'use strict';
 
     while (document.querySelector(selector) === null) {
-        await new Promise(resolve => requestAnimationFrame(resolve));
+        await new Promise((resolve, reject) => requestAnimationFrame(resolve));
     }
 
     return document.querySelector(selector);
@@ -98,115 +98,121 @@ const insertPlaybackSpeedHint = async () => {
 (async function() {
     'use strict';
 
-    const speedUpKey = 18;
+    let isPlayerSetup = false;
+
+    const speedUpKey = 192;
     const increaseSpeedKey = 33;
     const decreaseSpeedKey = 34;
     const resetSpeedKey = 46;
-    const fixSpeedKey = 17;
+    const fixSpeedKey = 9;
 
     let isSpeedUp = false;
     let isSpeedFixed = false;
     let speedUpRate = 3;
 
-    let videoPlayer = await waitElement("video");
-    console.log(`[YT Playback Speed Up] Video player initialized`);
+    const trySetupPlayer = async () => {
+        if (isPlayerSetup) return;
 
-    let speedBeforeModify = videoPlayer.playbackRate;
-    console.log(`[YT Playback Speed Up] Default playback speed is ${speedBeforeModify}`);
-
-    insertStyleSheet();
-    await insertPlaybackSpeedHint();
-    let playbackSpeedHint = await waitElement(".player-playback-speed-hint");
-    let playbackSpeedHintText = await waitElement(".player-playback-speed-hint-text");
-    console.log(`[YT Playback Speed Up] Player hint initialized`);
-
-    const updateStatus = () => {
-        if (isSpeedUp) {
-            videoPlayer.playbackRate = speedUpRate;
-            playbackSpeedHint.style.display = "";
-            playbackSpeedHintText.textContent = `Playback Speed x${speedUpRate.toFixed(1)}`;
-            console.log(`[YT Playback Speed Up] Speeding up playback`);
-        } else {
-            videoPlayer.playbackRate = speedBeforeModify;
-            playbackSpeedHint.style.display = "none";
-            console.log(`[YT Playback Speed Up] Set speed up rate to ${speedBeforeModify}`);
+        if (window.location.pathname !== "/watch") {
+            console.log(`[YT Playback Speed Up] URL pathname invalid`);
+            return;
         }
+
+        isPlayerSetup = true;
+
+        let videoPlayer = await waitElement("video");
+        console.log(`[YT Playback Speed Up] Video player initialized`);
+
+        let speedBeforeModify = videoPlayer.playbackRate;
+        console.log(`[YT Playback Speed Up] Default playback speed is ${speedBeforeModify}`);
+
+        insertStyleSheet();
+        await insertPlaybackSpeedHint();
+        let playbackSpeedHint = await waitElement(".player-playback-speed-hint");
+        let playbackSpeedHintText = await waitElement(".player-playback-speed-hint-text");
+        console.log(`[YT Playback Speed Up] Player hint initialized`);
+
+        const updateStatus = () => {
+            if (isSpeedUp) {
+                videoPlayer.playbackRate = speedUpRate;
+                playbackSpeedHint.style.display = "";
+                playbackSpeedHintText.textContent = `Playback Speed x${speedUpRate.toFixed(1)}`;
+                console.log(`[YT Playback Speed Up] Speeding up playback`);
+            } else {
+                videoPlayer.playbackRate = speedBeforeModify;
+                playbackSpeedHint.style.display = "none";
+                console.log(`[YT Playback Speed Up] Set speed up rate to ${speedBeforeModify}`);
+            }
+        };
+
+        document.addEventListener("keydown", async (event) => {
+            event.preventDefault();
+            switch(event.keyCode) {
+                case speedUpKey: {
+                    if (event.repeat || isSpeedFixed) return;
+
+                    isSpeedUp = true;
+
+                    if (isSpeedUp) {
+                        speedBeforeModify = videoPlayer.playbackRate;
+                        updateStatus();
+                    }
+
+                    break;
+                }
+                case increaseSpeedKey: {
+                    speedUpRate += 0.5;
+                    console.log(`[YT Playback Speed Up] Set speed up rate to ${speedUpRate}`);
+
+                    updateStatus();
+
+                    break;
+                }
+                case decreaseSpeedKey: {
+                    if (speedUpRate <= 0) return;
+
+                    speedUpRate -= 0.5;
+                    console.log(`[YT Playback Speed Up] Set speed up rate to ${speedUpRate}`);
+
+                    updateStatus();
+
+                    break;
+                }
+                case resetSpeedKey: {
+                    speedUpRate = 3;
+                    console.log(`[YT Playback Speed Up] Set speed up rate to ${speedUpRate}`);
+
+                    updateStatus();
+
+                    break;
+                }
+                case fixSpeedKey: {
+                    if (!isSpeedUp && !isSpeedFixed) return;
+
+                    if (isSpeedUp && !isSpeedFixed) {
+                        isSpeedFixed = true;
+                    } else {
+                        isSpeedUp = false;
+                        isSpeedFixed = false;
+                    }
+
+                    updateStatus();
+
+                    break;
+                }
+                default: return;
+            }
+        });
+
+        document.addEventListener("keyup", (event) => {
+            event.preventDefault();
+            if (event.keyCode === speedUpKey && !isSpeedFixed) {
+                isSpeedUp = false;
+                updateStatus();
+            }
+        });
     };
 
-    document.addEventListener("keydown", async (event) => {
-        switch(event.keyCode) {
-            case speedUpKey: {
-                event.preventDefault();
-                
-                if (event.repeat || isSpeedFixed) return;
-
-                isSpeedUp = true;
-
-                if (isSpeedUp) {
-                    speedBeforeModify = videoPlayer.playbackRate;
-                    updateStatus();
-                }
-
-                break;
-            }
-            case increaseSpeedKey: {
-                event.preventDefault();
-                
-                speedUpRate += 0.5;
-                console.log(`[YT Playback Speed Up] Set speed up rate to ${speedUpRate}`);
-
-                updateStatus();
-
-                break;
-            }
-            case decreaseSpeedKey: {
-                event.preventDefault();
-                
-                if (speedUpRate <= 0) return;
-
-                speedUpRate -= 0.5;
-                console.log(`[YT Playback Speed Up] Set speed up rate to ${speedUpRate}`);
-
-                updateStatus();
-
-                break;
-            }
-            case resetSpeedKey: {
-                event.preventDefault();
-                
-                speedUpRate = 3;
-                console.log(`[YT Playback Speed Up] Set speed up rate to ${speedUpRate}`);
-
-                updateStatus();
-
-                break;
-            }
-            case fixSpeedKey: {
-                event.preventDefault();
-                
-                if (!isSpeedUp && !isSpeedFixed) return;
-
-                if (isSpeedUp && !isSpeedFixed) {
-                    isSpeedFixed = true;
-                } else {
-                    isSpeedUp = false;
-                    isSpeedFixed = false;
-                }
-
-                updateStatus();
-
-                break;
-            }
-            default: return;
-        }
-    });
-
-    document.addEventListener("keyup", (event) => {
-        if (event.keyCode === speedUpKey && !isSpeedFixed) {
-            event.preventDefault();
-            
-            isSpeedUp = false;
-            updateStatus();
-        }
-    });
+    await trySetupPlayer();
+    document.addEventListener("selectionchange", trySetupPlayer);
 })();
