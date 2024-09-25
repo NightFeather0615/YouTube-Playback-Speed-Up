@@ -4,7 +4,7 @@
 // @name:zh-HK        YouTube 播放加速
 // @name:zh-CN        YouTube 播放加速
 // @namespace         https://github.com/NightFeather0615
-// @version           2.6.0
+// @version           2.6.1
 // @description       Speeding up shit talking without leaving out any information
 // @description:zh-TW 不錯過資訊的同時跳過廢話
 // @description:zh-HK 不錯過資訊的同時跳過廢話
@@ -111,12 +111,7 @@ const insertPlaybackSpeedHint = async () => {
     let speedUpRate = 3;
 
     const trySetupPlayer = async () => {
-        if (isPlayerSetup) return;
-
-        if (window.location.pathname !== "/watch") {
-            console.log(`[YT Playback Speed Up] URL pathname invalid`);
-            return;
-        }
+        if (window.location.pathname !== "/watch" || isPlayerSetup) return;
 
         isPlayerSetup = true;
 
