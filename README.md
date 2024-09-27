@@ -1,4 +1,4 @@
-# YouTube-Playback-Speed-Up
+# [YouTube Playback Speed Up](https://github.com/NightFeather0615/YouTube-Playback-Speed-Up)
 Speeding up shit talking without leaving out any information
 
 ## Install
