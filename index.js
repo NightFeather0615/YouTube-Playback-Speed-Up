@@ -4,7 +4,7 @@
 // @name:zh-HK        YouTube 播放加速
 // @name:zh-CN        YouTube 播放加速
 // @namespace         https://github.com/NightFeather0615
-// @version           2.6.3
+// @version           2.6.4
 // @description       Speeding up shit talking without leaving out any information
 // @description:zh-TW 不錯過資訊的同時跳過廢話
 // @description:zh-HK 不錯過資訊的同時跳過廢話
@@ -22,6 +22,8 @@
 
 /* eslint no-multi-str: 0 */
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+
 const waitElement = async (selector) => {
     'use strict';
 
@@ -36,6 +38,15 @@ const asyncSleep = async (ms) => {
     'use strict';
 
     return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+const addSvgElement = (parent, tag, attributes = {}) => {
+    const el = document.createElementNS(SVG_NS, tag);
+    for (const [key, value] of Object.entries(attributes)) {
+        el.setAttribute(key, value);
+    }
+    parent.appendChild(el);
+    return el;
 };
 
 const insertStyleSheet = () => {
@@ -75,30 +86,52 @@ const insertStyleSheet = () => {
 const insertPlaybackSpeedHint = async () => {
     let moviePlayer = await waitElement("#movie_player");
 
-    let hint = document.createElement("div");
+    let hint = GM_addElement(moviePlayer, "div", {
+        class: "player-playback-speed-hint",
+        style: "display: none;",
+    });
 
-    GM_addElement(
-        hint,
-        "div",
-        {
-            className: "player-playback-speed-hint",
-            style: "display: none;",
-            innerHTML: ' \
-                <span class="player-playback-speed-hint-icon"> \
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-player-track-next-filled" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" stroke-width="2" stroke="white" fill="white" height="36" width="22"> \
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path> \
-                        <path d="M2 5v14c0 .86 1.012 1.318 1.659 .753l8 -7a1 1 0 0 0 0 -1.506l-8 -7c-.647 -.565 -1.659 -.106 -1.659 .753z" stroke-width="0" fill="currentColor"></path> \
-                        <path d="M13 5v14c0 .86 1.012 1.318 1.659 .753l8 -7a1 1 0 0 0 0 -1.506l-8 -7c-.647 -.565 -1.659 -.106 -1.659 .753z" stroke-width="0" fill="currentColor"></path> \
-                    </svg> \
-                </span> \
-                <span class="player-playback-speed-hint-text"> \
-                </span> \
-            '
-        }
-    ); // Icon from Tabler Icons
-}
+    // Icon from Tabler Icons
+    let icon = GM_addElement(hint, "span", {
+        class: "player-playback-speed-hint-icon",
+    });
 
+    let svg = addSvgElement(icon, "svg", {
+        class: "icon icon-tabler icon-tabler-player-track-next-filled",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        viewBox: "0 0 24 24",
+        "stroke-width": "2",
+        stroke: "white",
+        fill: "white",
+        height: "36",
+        width: "22",
+    });
 
+    addSvgElement(svg, "path", {
+        stroke: "none",
+        d: "M0 0h24v24H0z",
+        fill: "none",
+    });
+
+    const trackPath = "v14c0 .86 1.012 1.318 1.659 .753l8 -7a1 1 0 0 0 0 -1.506l-8 -7c-.647 -.565 -1.659 -.106 -1.659 .753z";
+
+    addSvgElement(svg, "path", {
+        d: "M2 5" + trackPath,
+        "stroke-width": "0",
+        fill: "currentColor",
+    });
+
+    addSvgElement(svg, "path", {
+        d: "M13 5" + trackPath,
+        "stroke-width": "0",
+        fill: "currentColor",
+    });
+
+    GM_addElement(hint, "span", {
+        class: "player-playback-speed-hint-text",
+    });
+};
 
 (async function() {
     'use strict';
