@@ -12,7 +12,7 @@
 // @author            NightFeather
 // @match             *://www.youtube.com/*
 // @icon              https://www.google.com/s2/favicons?sz=64&domain=youtube.com
-// @grant             none
+// @grant             GM_addElement
 // @license           MPL-2.0
 // ==/UserScript==
 
@@ -76,9 +76,14 @@ const insertPlaybackSpeedHint = async () => {
     let moviePlayer = await waitElement("#movie_player");
 
     let hint = document.createElement("div");
-    hint.className = "player-playback-speed-hint";
-    hint.style.display = "none";
-    hint.innerHTML = ' \
+
+    GM_addElement(
+        hint,
+        "div",
+        {
+            className: "player-playback-speed-hint",
+            style: "display: none;",
+            innerHTML = ' \
 <span class="player-playback-speed-hint-icon"> \
     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-player-track-next-filled" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" stroke-width="2" stroke="white" fill="white" height="36" width="22"> \
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path> \
@@ -88,9 +93,9 @@ const insertPlaybackSpeedHint = async () => {
 </span> \
 <span class="player-playback-speed-hint-text"> \
 </span> \
-    '; // Icon from Tabler Icons
-
-    moviePlayer.appendChild(hint);
+    '
+        }
+    ); // Icon from Tabler Icons
 }
 
 
